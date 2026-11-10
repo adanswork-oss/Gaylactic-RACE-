@@ -264,8 +264,8 @@ textarea.in{width:100%;min-height:90px;font-family:var(--mono);font-size:12px;re
 (function(){
 const CIRCS=[
   {id:'tat',name:'Tatooine',col:'#ff8a2a'},
-  {id:'jak',name:'Jakku',col:'#d9b26b'},
-  {id:'lan',name:'Lantaana',col:'#8be05a'}
+  {id:'lan',name:'Lantaana',col:'#8be05a'},
+  {id:'jak',name:'Jakku',col:'#d9b26b'}
 ];
 const PRIZES={
   tat:{title:'Épica figura de Grogu ganador',desc:'Mega épica figura del famoso Grogu haciendo su saludo natal.',n:3},
@@ -408,6 +408,9 @@ function timeHTML(d){
 }
 
 /* ---------- views ---------- */
+function prizeBanner(c,leader){const pz=PRIZES[c];
+   return '<button class="pban" style="--img:url('+pimg(c,0)+')" data-a="goPrize" data-v="'+c+'"><div class="pt"><div class="pk">🏆 SE LLEVA EL PREMIO</div><div class="pn">'+esc(pz.title)+'</div><div class="po">'+
+     (leader?'Ahora mismo se lo lleva <b>'+esc(leader.p.name)+'</b> · <span class="t">'+fmt(leader.best.ms)+'</span>':'Todavía sin dueño. ¿Quién se lo lleva?')+'</div></div><span class="pc">VER ›</span></button>';}
 function viewCircuit(c){
   const r=ranking(c),leader=r[0]&&r[0].best?r[0]:null;
   const total=state.attempts.filter(a=>a.c===c&&pilot(a.p)&&!pilot(a.p).out).length;
@@ -416,12 +419,9 @@ function viewCircuit(c){
   h+=leader?'<div class="lead"><span>🏆</span><span class="who">'+esc(leader.p.name)+'</span><span class="t">'+fmt(leader.best.ms)+'</span></div>'
            :'<div class="lead"><span class="none">Sin tiempos todavía. ¡A correr!</span></div>';
   h+='<div class="hstats">'+total+' intento'+(total===1?'':'s')+' · '+withTime+' de '+r.length+' pilotos con tiempo</div></section>';
-  {const pz=PRIZES[c];
-   h+='<button class="pban" style="--img:url('+pimg(c,0)+')" data-a="goPrize" data-v="'+c+'"><div class="pt"><div class="pk">🏆 SE LLEVA EL PREMIO</div><div class="pn">'+esc(pz.title)+'</div><div class="po">'+
-     (leader?'Ahora mismo se lo lleva <b>'+esc(leader.p.name)+'</b> · <span class="t">'+fmt(leader.best.ms)+'</span>':'Todavía sin dueño. ¿Quién se lo lleva?')+'</div></div><span class="pc">VER ›</span></button>';}
 
   if(!active().length){
-    return h+'<div class="card empty">Aún no hay pilotos en el torneo.'+(readOnly?'':'<br><button class="btn pri" data-a="tab" data-v="pilotos">Añadir pilotos</button>')+'</div>';
+    return h+prizeBanner(c,leader)+'<div class="card empty">Aún no hay pilotos en el torneo.'+(readOnly?'':'<br><button class="btn pri" data-a="tab" data-v="pilotos">Añadir pilotos</button>')+'</div>';
   }
   if(!readOnly){
     const pt=parseDigits(ui.digits);
@@ -461,6 +461,7 @@ function viewCircuit(c){
   });
   h+='</section>';
 
+  h+=prizeBanner(c,leader);
   const last=state.attempts.filter(a=>a.c===c&&pilot(a.p)).sort((a,b)=>b.at-a.at).slice(0,5);
   if(last.length){
     h+='<section class="card log"><h2>Últimos intentos</h2>';
@@ -470,10 +471,6 @@ function viewCircuit(c){
     });
     h+='</section>';
   }
-  const pz=PRIZES[c];
-  h+='<button class="card mini" data-a="goPrize" data-v="'+c+'"><div class="mi"><img src="'+pimg(c,0,1)+'" alt=""></div><div class="mt"><div class="mk">🏆 EL PREMIO</div><div class="mn">'+esc(pz.title)+'</div><div class="md">'+esc(pz.desc)+'</div><div class="ms">';
-  for(let i=1;i<pz.n;i++)h+='<img src="'+pimg(c,i,1)+'" alt="">';
-  h+='</div></div><span class="chev">›</span></button>';
   return h;
 }
 

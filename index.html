@@ -182,6 +182,19 @@ textarea.in{width:100%;min-height:90px;font-family:var(--mono);font-size:12px;re
 .pz-owner b{font-size:16px}
 .pz-owner .t{font-family:var(--mono);color:var(--gold);margin-left:auto}
 .pz-owner.none{color:var(--mut)}
+.pban{position:relative;display:flex;align-items:center;width:100%;min-height:128px;text-align:left;margin-bottom:12px;border-radius:18px;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--gold) 45%, var(--line));
+  background:linear-gradient(90deg,#17110a 0%,#17110a 42%,rgba(23,17,10,.55) 62%,rgba(23,17,10,0) 85%),var(--img) right 30%/58% auto no-repeat,#17110a;
+  box-shadow:0 14px 34px -18px rgba(255,201,64,.55)}
+.pban:after{content:"";position:absolute;inset:-30% -60%;pointer-events:none;background:linear-gradient(105deg,transparent 44%,rgba(255,235,180,.14) 50%,transparent 56%);animation:sweep 4.5s ease-in-out infinite}
+.pban .pt{position:relative;z-index:1;padding:14px 16px;max-width:64%}
+.pban .pk{font-size:10px;letter-spacing:.26em;font-weight:700;color:var(--gold)}
+.pban .pn{font-size:18px;font-weight:700;line-height:1.1;margin:4px 0 6px;text-transform:uppercase;
+  background:linear-gradient(180deg,#fff6dc,#ffd36a 60%,#d39222);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pban .po{font-size:12px;color:#d8ccb8}
+.pban .po b{color:var(--txt)}
+.pban .po .t{font-family:var(--mono);color:var(--gold)}
+.pban .pc{position:absolute;z-index:1;right:10px;bottom:10px;font-size:11px;font-weight:700;letter-spacing:.1em;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;border:1px solid rgba(255,255,255,.2)}
 .mini{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border-color:color-mix(in srgb,var(--c) 35%, var(--line))}
 .mini .mi{flex:none;width:76px;height:96px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
 .mini .mi img{width:100%;height:100%;object-fit:cover;display:block}
@@ -403,6 +416,9 @@ function viewCircuit(c){
   h+=leader?'<div class="lead"><span>🏆</span><span class="who">'+esc(leader.p.name)+'</span><span class="t">'+fmt(leader.best.ms)+'</span></div>'
            :'<div class="lead"><span class="none">Sin tiempos todavía. ¡A correr!</span></div>';
   h+='<div class="hstats">'+total+' intento'+(total===1?'':'s')+' · '+withTime+' de '+r.length+' pilotos con tiempo</div></section>';
+  {const pz=PRIZES[c];
+   h+='<button class="pban" style="--img:url('+pimg(c,0)+')" data-a="goPrize" data-v="'+c+'"><div class="pt"><div class="pk">🏆 SE LLEVA EL PREMIO</div><div class="pn">'+esc(pz.title)+'</div><div class="po">'+
+     (leader?'Ahora mismo se lo lleva <b>'+esc(leader.p.name)+'</b> · <span class="t">'+fmt(leader.best.ms)+'</span>':'Todavía sin dueño. ¿Quién se lo lleva?')+'</div></div><span class="pc">VER ›</span></button>';}
 
   if(!active().length){
     return h+'<div class="card empty">Aún no hay pilotos en el torneo.'+(readOnly?'':'<br><button class="btn pri" data-a="tab" data-v="pilotos">Añadir pilotos</button>')+'</div>';

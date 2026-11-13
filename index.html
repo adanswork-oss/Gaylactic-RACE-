@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e0b08">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gaylactic Race">
+<link rel="apple-touch-icon" href="img/icon.png">
 <title>Gaylactic Race</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -256,7 +261,7 @@ textarea.in{width:100%;min-height:90px;font-family:var(--mono);font-size:12px;re
 .dlg .bts{justify-content:flex-end}
 
 .cgrid{display:flex;flex-direction:column}
-@media (min-width:820px){
+@media (min-width:760px){
   body{padding-bottom:calc(env(safe-area-inset-bottom) + 40px)}
   .wrap{max-width:1180px;padding:0 28px}
   header{padding-top:20px}
@@ -381,7 +386,8 @@ function syncHTML(){
   const m={ok:['ok',isOwner?'Sincronizado':'En directo'],connecting:['warn','Conectando…'],slow:['warn','Sin conexión · mostrando lo último'],
     local:['err','No se pudo conectar'],err:['err','Error al sincronizar']}[sync]||['warn',''];
   const lock=isOwner?'<button class="lock on" data-a="logout" aria-label="Salir del modo organizador">🔓</button>':'<button class="lock" data-a="login" aria-label="Acceso organizador">🔒</button>';
-  return '<div class="sync '+m[0]+'" id="sync"><span>'+m[1]+'</span><i class="dot"></i>'+lock+'</div>';
+  const fsb=(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'<button class="lock" data-a="fullscreen" aria-label="Pantalla completa">⛶</button>':'';
+  return '<div class="sync '+m[0]+'" id="sync"><span>'+m[1]+'</span><i class="dot"></i>'+fsb+lock+'</div>';
 }
 function commit(){cache();if(isOwner){dirty=true;flush()}renderNow()}
 async function flush(){
@@ -686,6 +692,9 @@ const actions={
     renderNow();
   },
   reg:register,
+  fullscreen:()=>{const d=document,el=d.documentElement;
+    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
+    try{const r=(el.requestFullscreen||el.webkitRequestFullscreen).call(el);if(r&&r.catch)r.catch(()=>toast('Tu navegador no deja pantalla completa: añádela a la pantalla de inicio'))}catch(e){toast('Tu navegador no deja pantalla completa: añádela a la pantalla de inicio')}},
   login:()=>{ui.login=true;ui.loginErr='';renderNow();setTimeout(()=>{const i=document.querySelector('#loginf input');if(i)i.focus()},50)},
   loginClose:()=>{ui.login=false;ui.loginErr='';renderNow()},
   logout:()=>ask('¿Salir del modo organizador? Seguirás viendo todo, pero sin poder apuntar tiempos.','Salir',async()=>{try{await authApi.signOut(auth)}catch(e){};toast('Has salido del modo organizador')}),

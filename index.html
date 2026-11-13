@@ -254,6 +254,53 @@ textarea.in{width:100%;min-height:90px;font-family:var(--mono);font-size:12px;re
 .dlg{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;width:100%;max-width:420px}
 .dlg p{margin:0 0 16px;font-size:16px;line-height:1.4}
 .dlg .bts{justify-content:flex-end}
+
+.cgrid{display:flex;flex-direction:column}
+@media (min-width:820px){
+  body{padding-bottom:calc(env(safe-area-inset-bottom) + 40px)}
+  .wrap{max-width:1180px;padding:0 28px}
+  header{padding-top:20px}
+  .brand b{font-size:26px}
+  .sync{font-size:12px;max-width:none}
+  nav{margin:8px -28px 18px;padding:8px 28px}
+  nav .tab:first-child{margin-left:auto}
+  nav .tab:last-child{margin-right:auto}
+  .tab{padding:11px 20px;font-size:16px}
+  .hero{padding:24px 26px}
+  .hero.ph{min-height:320px}
+  .hero.ph h1{font-size:72px}
+  .hero .lead .t{font-size:30px}.hero .lead .who{font-size:22px}
+  .cgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:0 18px;align-items:start;grid-template-areas:"main side" "ext side"}
+  .cgrid.ro{grid-template-areas:"main ext"}
+  .cmain{grid-area:main}.cext{grid-area:ext}.cside{grid-area:side;position:sticky;top:76px}
+  .key{padding:18px 0;font-size:28px}
+  .timebox{font-size:56px}
+  .row{padding:14px 8px}.nm{font-size:18px}.tm{font-size:22px}
+  .land{margin:0 0 30px;height:min(72vh,720px);border-radius:28px}
+  .land .lt{left:40px;right:40px;bottom:40px}
+  .land h1{font-size:clamp(84px,11vw,150px)}
+  .land .sub{font-size:19px}
+  .ctas{max-width:460px}
+  .step{margin-bottom:40px}
+  .step h2{font-size:38px}
+  .step p{font-size:19px;max-width:760px}
+  .ccs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ccs .cc{height:220px;margin:0}
+  .pzs{gap:14px}
+  .pzs button{aspect-ratio:4/5}
+  .rule{padding:30px 32px}.rule h2{font-size:52px}.rule p{font-size:19px;max-width:720px}
+  .fin{font-size:34px}
+  .prizes{display:grid;grid-template-columns:1fr;gap:22px;max-width:640px;margin:0 auto}
+  .prize{margin:0}
+  .pods{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .pods .card{margin:0}
+  .pods+.card{margin-top:14px}
+  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .mini{display:none}
+}
+@media (min-width:1050px){
+  .prizes{grid-template-columns:repeat(3,1fr);max-width:none;align-items:start}
+}
 </style>
 </head>
 <body>
@@ -423,7 +470,9 @@ function viewCircuit(c){
   if(!active().length){
     return h+prizeBanner(c,leader)+'<div class="card empty">Aún no hay pilotos en el torneo.'+(readOnly?'':'<br><button class="btn pri" data-a="tab" data-v="pilotos">Añadir pilotos</button>')+'</div>';
   }
+  h+='<div class="cgrid'+(readOnly?' ro':'')+'">';
   if(!readOnly){
+    h+='<div class="cside">';
     const pt=parseDigits(ui.digits);
     h+='<section class="card"><div class="lbl"><b>1</b> · ¿Quién ha corrido?</div><div class="chips">';
     active().forEach(p=>{
@@ -436,9 +485,10 @@ function viewCircuit(c){
     h+='<div class="pad">';
     ['1','2','3','4','5','6','7','8','9'].forEach(k=>h+='<button class="key" data-a="key" data-v="'+k+'">'+k+'</button>');
     h+='<button class="key fn" data-a="key" data-v="C">Borrar</button><button class="key" data-a="key" data-v="0">0</button><button class="key fn" data-a="key" data-v="B">⌫</button></div>';
-    h+='<button class="go" data-a="reg"'+(ui.pilot&&pt.ok?'':' disabled')+'>Registrar intento</button></section>';
+    h+='<button class="go" data-a="reg"'+(ui.pilot&&pt.ok?'':' disabled')+'>Registrar intento</button></section></div>';
   }
 
+  h+='<div class="cmain">';
   h+='<section class="card"><h2>Clasificación <em>toca para ver intentos</em></h2>';
   let pos=0;
   r.forEach((x,i)=>{
@@ -459,8 +509,7 @@ function viewCircuit(c){
       h+='</div>';
     }
   });
-  h+='</section>';
-
+  h+='</section></div><div class="cext">';
   h+=prizeBanner(c,leader);
   const last=state.attempts.filter(a=>a.c===c&&pilot(a.p)).sort((a,b)=>b.at-a.at).slice(0,5);
   if(last.length){
@@ -471,6 +520,7 @@ function viewCircuit(c){
     });
     h+='</section>';
   }
+  h+='</div></div>';
   return h;
 }
 
@@ -482,13 +532,13 @@ function viewHome(){
   h+='<div class="ctas"><button class="btn pri" data-a="tab" data-v="podio">🏆 Clasificación</button><button class="btn" data-a="tab" data-v="premios">🎁 Premios</button></div></div></section>';
   h+='<section class="step"><div class="sn">01</div><h2>Cómo va esto</h2><p>Gana quien haga <b>el mejor tiempo</b>. Hay 3 circuitos y podéis elegir el que queráis, e ir cambiando de circuito en cada intento por si queréis mejorar vuestro tiempo en uno u otro.</p>';
   h+='<p>Cada circuito es una carrera de las de siempre: corres contra varios bots, pero lo que cuenta de verdad es <b>el tiempo en el que acabas la carrera</b>.</p></section>';
-  h+='<section class="step"><div class="sn">02</div><h2>Los circuitos</h2>';
+  h+='<section class="step"><div class="sn">02</div><h2>Los circuitos</h2><div class="ccs">';
   CIRCS.forEach(c=>{
     const l=ranking(c.id).find(x=>x.best);
     h+='<button class="cc" style="--cc:'+c.col+';--img:url(img/'+c.id+'-s.jpg)" data-a="tab" data-v="'+c.id+'"><span class="go2">CORRER ›</span><div class="in2"><div class="cn">'+esc(cname(c.id))+'</div><div class="cl">'+
       (l?'🏆 Manda '+esc(l.p.name)+' · <b>'+fmt(l.best.ms)+'</b>':'Sin tiempos todavía')+'</div></div></button>';
   });
-  h+='</section>';
+  h+='</div></section>';
   h+='<section class="step"><div class="sn">03</div><h2>Los premios</h2><p>Hay 3 premios, <b>uno por circuito</b>. Elegid el que más os guste y competid con los demás por el mejor tiempo para llevároslo a casa.</p><div class="pzs">';
   CIRCS.forEach(c=>h+='<button style="--cc:'+c.col+'" data-a="goPrize" data-v="'+c.id+'"><img src="'+pimg(c.id,0,1)+'" alt=""><span>'+esc(cname(c.id))+'</span></button>');
   h+='</div></section>';
@@ -500,6 +550,7 @@ function viewHome(){
 
 function viewPrizes(){
   let h='<section class="hero" style="--c:#ffc940"><div class="kick">EL BOTÍN</div><h1>Premios</h1><div class="hstats">Tres circuitos, tres premios. Solo se lo lleva el más rápido.</div></section>';
+  h+='<div class="prizes">';
   CIRCS.forEach((c,k)=>{
     const pz=PRIZES[c.id],g=ui.gal[c.id]||0;
     const lead=ranking(c.id).find(x=>x.best);
@@ -512,11 +563,13 @@ function viewPrizes(){
            :'<div class="pz-owner none">Todavía sin dueño. ¿Quién se lo lleva?</div>';
     h+='</div></section>';
   });
+  h+='</div>';
   return h;
 }
 
 function viewPodium(){
   let h='<section class="hero" style="--c:#ffc940"><div class="kick">TORNEO</div><h1>Podio</h1><div class="hstats">Un premio para el 1º de cada circuito</div></section>';
+  h+='<div class="pods">';
   CIRCS.forEach(c=>{
     const r=ranking(c.id).filter(x=>x.best);
     h+='<section class="card pod" style="--pc:'+c.col+';--img:url(img/'+c.id+'-s.jpg)"><div class="ban"></div><h2>'+esc(cname(c.id))+'</h2>';
@@ -527,6 +580,7 @@ function viewPodium(){
     }
     h+='</section>';
   });
+  h+='</div>';
   if(active().length){
     h+='<section class="card"><h2>Intentos por piloto</h2><table><tr><th>Piloto</th>';
     CIRCS.forEach(c=>h+='<th>'+esc(cname(c.id).slice(0,4))+'</th>');
@@ -544,6 +598,7 @@ function viewPodium(){
 function viewPilots(){
   const n=active().length;
   let h='<section class="hero ph" style="--c:#ff7b1c;--img:url(img/pilotos.jpg);background-position:center 22%,center 22%"><div class="kick">PARRILLA</div><h1>Pilotos</h1><div class="hstats">'+n+' en carrera'+(state.pilots.length>n?' · '+(state.pilots.length-n)+' no vienen':'')+'</div></section>';
+  h+='<div class="pgrid"><div>';
   h+='<section class="card"><h2>Lista</h2>';
   if(!state.pilots.length&&readOnly)h+='<p class="note">Aún no hay pilotos apuntados.</p>';
   if(!state.pilots.length&&!readOnly)h+='<p class="note">Añade a los que vengáis. Si alguien falla, márcalo como «No viene» y desaparece de las clasificaciones.</p>';
@@ -555,6 +610,7 @@ function viewPilots(){
   if(!readOnly)h+='<div class="addrow"><input class="in" id="newName" data-i="newName" placeholder="Nombre del piloto" maxlength="40" value="'+esc(ui.newName)+'" enterkeyhint="done"><button class="btn pri" data-a="addP">Añadir</button></div>';
   h+='</section>';
 
+  h+='</div><div>';
   if(!readOnly){
     h+='<section class="card"><h2>Circuitos</h2>';
     CIRCS.forEach(c=>h+='<div class="pl"><i class="dot" style="background:'+c.col+'"></i><input class="in" data-c="renameC" data-v="'+c.id+'" value="'+esc(cname(c.id))+'" maxlength="30"></div>');
@@ -564,6 +620,7 @@ function viewPilots(){
     h+='<textarea class="in" data-i="importText" placeholder="Pega aquí una copia para restaurarla">'+esc(ui.importText)+'</textarea>';
     h+='<div class="bts" style="margin-top:8px"><button class="btn" data-a="import">Restaurar copia</button><button class="btn dng" data-a="reset">Borrar todos los tiempos</button></div></section>';
   }
+  h+='</div></div>';
   return h;
 }
 
